@@ -2,7 +2,7 @@ const express = require('express');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');/* to connect server to the database */
 const cors = require('cors');
 require('dotenv').config();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8000;
 const app = express();
 
 // middleware 
@@ -19,8 +19,16 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         await client.connect();
-        const billingCollection = client.db('powerHunter').collection('billingList');
+        const billingCollection = client.db('powerHack').collection('billingList');
         console.log('db connected');
+
+        // get all saved billing and send to client
+        app.get('/billing-list', async (req, res) => {
+            const query = {};
+            const cursor = billingCollection.find(query);
+            const bills = await cursor.toArray();
+            res.send(bills);
+        });
 
     }
     finally {
